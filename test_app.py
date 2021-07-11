@@ -23,4 +23,29 @@ def test_pred_virginica():
         response = client.post("/predict_flower", json=payload)
         # asserting the correct response is received
         assert response.status_code == 200
-        assert response.json() == {"flower_class": "Iris Virginica"}
+        assert "flower_class" in response.json()
+        assert "time_stamp" in response.json()
+       
+def test_feedback_loop():
+    payload2 = [{
+        "sepal_length": 3,
+        "sepal_width": 5,
+        "petal_length": 3.2,
+        "petal_width": 4.4,
+        "flower_class": "Iris Virginica"
+    }]
+    with TestClient(app) as client:
+        response = client.post("/feedback_loop",json=payload2)
+        assert response.status_code == 200
+        assert "detail" in response.json()
+        assert "time_stamp" in response.json()
+
+def test_pred_flower_error():
+    payload = {
+        "sepal_length": 3,
+        "sepal_width": 5,
+        "petal_length": 3.2,
+    }
+    with TestClient(app) as client:
+        response = client.post("/predict_flower",json=payload)
+        assert response.status_code == 422
